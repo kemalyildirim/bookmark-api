@@ -1,7 +1,7 @@
 package dev.kemalyi.bookmarker.bookmark.rest;
 
 import dev.kemalyi.bookmarker.bookmark.BookmarkService;
-import dev.kemalyi.bookmarker.bookmark.BookmarksDto;
+import dev.kemalyi.bookmarker.bookmark.dto.BookmarksDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +20,6 @@ public class BookmarkController {
 
     @GetMapping("{page}")
     public BookmarksDto getBookmarks(@PathVariable(name = "page") Optional<Integer> page) {
-        System.out.println("page: " + page);
         return service.getBookmarks(page.orElse(1));
     }
 }

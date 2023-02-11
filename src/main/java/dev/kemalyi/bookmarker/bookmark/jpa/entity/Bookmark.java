@@ -1,4 +1,4 @@
-package dev.kemalyi.bookmarker.bookmark.jpa;
+package dev.kemalyi.bookmarker.bookmark.jpa.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

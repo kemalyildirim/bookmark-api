@@ -1,5 +1,6 @@
 package dev.kemalyi.bookmarker.bookmark;
 
+import dev.kemalyi.bookmarker.bookmark.dto.BookmarksDto;
 import dev.kemalyi.bookmarker.bookmark.jpa.BookmarkRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -17,7 +18,7 @@ public class BookmarkService {
     @Transactional(readOnly = true)
     public BookmarksDto getBookmarks(Integer page) {
         page = page < 1 ? 0 : page - 1;
-        Pageable pageable = PageRequest.of(page, 1, Sort.Direction.DESC, "createdAt");
-        return new BookmarksDto(repository.findAll(pageable));
+        Pageable pageable = PageRequest.of(page, 2, Sort.Direction.DESC, "createdAt");
+        return new BookmarksDto(repository.findBookmarks(pageable));
     }
 }
