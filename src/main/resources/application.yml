@@ -2,4 +2,6 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
+  flyway:
+    locations: classpath:/db/migration/{vendor}
