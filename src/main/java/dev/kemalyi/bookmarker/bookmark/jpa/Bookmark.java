@@ -16,7 +16,8 @@ import java.time.Instant;
 @Setter
 public class Bookmark {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "bookmark_id_seq_gen", sequenceName = "bookmark_id_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bookmark_id_seq_gen")
     private Long id;
     @Column(nullable = false)
     private String title;
