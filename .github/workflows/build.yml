@@ -29,7 +29,7 @@ jobs:
       - name: Execute Gradle Build
         run: ./gradlew build
 
-      - if: ${{ github.ref == 'refs/head/main' }} # main branch only
+      - if: ${{ github.ref == 'refs/heads/main' }} # main branch only
         name: Build Docker Image
         run:
           ./gradlew build
