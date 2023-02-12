@@ -3,6 +3,7 @@ name: Build
 on:
   push:
     branches: [ "main" ]
+    tags: '*'
   pull_request:
     branches: [ "main" ]
 
@@ -27,12 +28,12 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
       - name: Execute Gradle Build
-        run: ./gradlew build
+        run: ./gradlew check
 
-      - if: ${{ github.ref == 'refs/heads/main' }} # main branch only
+      - if: ${{ startsWith(github.ref, 'refs/tags/') }} # only with tag pushes TODO: remove ref/main
         name: Build Docker Image
-        run:
-          ./gradlew build
-          docker build . --file Dockerfile --tag kemalyi-bookmarker-api:${{ github.ref_name }}
+        run: |
+          ./gradlew clean build -x check
+          docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/bookmarker-api:${{ github.ref_name }}
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker push ${{ secrets.DOCKER_USERNAME }}/bookmarker-api:${{ github.ref_name }}
