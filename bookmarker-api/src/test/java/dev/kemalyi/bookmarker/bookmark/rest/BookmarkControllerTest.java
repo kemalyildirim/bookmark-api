@@ -3,7 +3,6 @@ package dev.kemalyi.bookmarker.bookmark.rest;
 import dev.kemalyi.bookmarker.bookmark.jpa.BookmarkRepository;
 import dev.kemalyi.bookmarker.bookmark.jpa.entity.Bookmark;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.shaded.org.hamcrest.CoreMatchers;
 
 import java.time.Instant;
 import java.util.List;
@@ -28,7 +26,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 })
 class BookmarkControllerTest {
 
-    private List<Bookmark> bookmarks;
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -37,18 +34,27 @@ class BookmarkControllerTest {
     @BeforeEach
     void setUp() {
         repository.deleteAllInBatch();
-        bookmarks = List.of(
-            new Bookmark(null, "test", "test.com", Instant.now(), null),
-            new Bookmark(null, "test2", "test2.com", Instant.now(), null),
-            new Bookmark(null, "Google", "google.com", Instant.now(), Instant.now().plusSeconds(60))
+        List<Bookmark> bookmarks = List.of(
+                new Bookmark(null, "Google", "www.google.com.tr", Instant.now(), null),
+                new Bookmark(null,"Twitter", "www.twitter.com", Instant.now(), null),
+                new Bookmark(null,"Facebook", "www.facebook.com", Instant.now(), null),
+                new Bookmark(null,"Twitch", "www.twitch.tv", Instant.now(), null),
+                new Bookmark(null,"Amazon", "www.amazon.com", Instant.now(), null),
+                new Bookmark(null,"GitHub", "www.github.com", Instant.now(), null),
+                new Bookmark(null,"FreeCodeCamp", "www.freecodecamp.com", Instant.now(), null),
+                new Bookmark(null,"LinkedIn", "www.linkedin.com", Instant.now(), null),
+                new Bookmark(null,"Youtube", "www.youtube.com", Instant.now(), null),
+                new Bookmark(null,"Reddit", "www.reddit.com", Instant.now(), null),
+                new Bookmark(null, "test", "test.com", Instant.now(), null),
+                new Bookmark(null, "test2", "test2.com", Instant.now(), null)
         );
         repository.saveAll(bookmarks);
     }
 
     @ParameterizedTest
     @CsvSource({
-            "1, 3, 2, 1",
-            "2, 3, 2, 2"
+            "1, 12, 6, 1",
+            "2, 12, 6, 2"
     })
     void shouldGetBookmarks(int page, int totalElements, int totalPages, int currentPage) throws Exception {
         mvc.perform(get("/api/bookmarks?page=" + page))
@@ -56,5 +62,17 @@ class BookmarkControllerTest {
                 .andExpect(jsonPath("$.totalElements").value(totalElements))
                 .andExpect(jsonPath("$.totalPages").value(totalPages))
                 .andExpect(jsonPath("$.currentPage").value(currentPage));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "tes, 2, 1",
+            "it, 4, 2"
+    })
+    void shouldGetFilteredBookmarks(String query, int totalElements, int totalPages) throws Exception {
+        mvc.perform(get("/api/bookmarks?query=" + query))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(totalElements))
+                .andExpect(jsonPath("$.totalPages").value(totalPages));
     }
 }

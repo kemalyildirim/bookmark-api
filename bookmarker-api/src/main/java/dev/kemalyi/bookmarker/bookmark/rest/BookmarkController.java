@@ -19,7 +19,10 @@ public class BookmarkController {
     private final BookmarkService service;
 
     @GetMapping
-    public BookmarksDto getBookmarks(@RequestParam(name = "page") Optional<Integer> page) {
-        return service.getBookmarks(page.orElse(1));
+    public BookmarksDto getBookmarks(@RequestParam(name = "page") Optional<Integer> page, @RequestParam(name = "query", required = false, defaultValue = "") String query) {
+        int actualPage = page.orElse(1);
+        if (query == null || query.isEmpty())
+            return service.getBookmarks(actualPage);
+        return service.searchBookmarks(query, actualPage);
     }
 }

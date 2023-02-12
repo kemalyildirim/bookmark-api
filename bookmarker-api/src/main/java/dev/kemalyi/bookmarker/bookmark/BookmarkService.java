@@ -13,12 +13,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class BookmarkService {
+    private static final int PAGE_SIZE = 2;
     private final BookmarkRepository repository;
 
-    @Transactional(readOnly = true)
-    public BookmarksDto getBookmarks(Integer page) {
+    private Pageable bookmarkPageableBootstrap(int page) {
         page = page < 1 ? 0 : page - 1;
-        Pageable pageable = PageRequest.of(page, 2, Sort.Direction.DESC, "createdAt");
+        return PageRequest.of(page, PAGE_SIZE, Sort.Direction.DESC, "createdAt");
+    }
+
+    @Transactional(readOnly = true)
+    public BookmarksDto getBookmarks(int page) {
+        Pageable pageable = bookmarkPageableBootstrap(page);
         return new BookmarksDto(repository.findBookmarks(pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public BookmarksDto searchBookmarks(String query, int page) {
+        Pageable pageable = bookmarkPageableBootstrap(page);
+        return new BookmarksDto(repository.searchBookmarks(query, pageable));
     }
 }
