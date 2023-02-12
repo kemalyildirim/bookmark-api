@@ -51,7 +51,7 @@ class BookmarkControllerTest {
             "2, 3, 2, 2"
     })
     void shouldGetBookmarks(int page, int totalElements, int totalPages, int currentPage) throws Exception {
-        mvc.perform(get("/api/bookmarks/" + page))
+        mvc.perform(get("/api/bookmarks?page=" + page))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(totalElements))
                 .andExpect(jsonPath("$.totalPages").value(totalPages))
