@@ -1,23 +1,11 @@
 package dev.kemalyi.bookmarker.bookmark.dto;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.data.domain.Page;
-
 import java.util.List;
 
-@Setter
-@Getter
-public class BookmarksDto {
-    private List<BookmarkDto> bookmarks;
-    private int totalPages;
-    private long totalElements;
-    private int currentPage;
+public record BookmarksDto(int totalPages, long totalElements, int currentPage, List<BookmarkDto> bookmarks) {
 
-    public BookmarksDto(Page<BookmarkDto> bookmarkPage) {
-        this.bookmarks = bookmarkPage.getContent();
-        this.totalElements = bookmarkPage.getTotalElements();
-        this.currentPage = bookmarkPage.getNumber() + 1;
-        this.totalPages = bookmarkPage.getTotalPages();
+    public BookmarksDto(Page<BookmarkDto> bookmarks) {
+        this(bookmarks.getTotalPages(), bookmarks.getTotalElements(), bookmarks.getNumber() + 1, bookmarks.getContent());
     }
 }
