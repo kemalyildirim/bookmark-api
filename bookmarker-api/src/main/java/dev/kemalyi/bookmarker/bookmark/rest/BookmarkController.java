@@ -1,12 +1,14 @@
 package dev.kemalyi.bookmarker.bookmark.rest;
 
 import dev.kemalyi.bookmarker.bookmark.BookmarkService;
+import dev.kemalyi.bookmarker.bookmark.dto.BookmarkDto;
 import dev.kemalyi.bookmarker.bookmark.dto.BookmarksDto;
+import dev.kemalyi.bookmarker.bookmark.rest.requests.CreateBookmarkRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 
 import java.util.Optional;
@@ -15,6 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/bookmarks")
+@Slf4j
 public class BookmarkController {
     private final BookmarkService service;
 
@@ -24,5 +27,12 @@ public class BookmarkController {
         if (query == null || query.isEmpty())
             return service.getBookmarks(actualPage);
         return service.searchBookmarks(query, actualPage);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public BookmarkDto createBookmark(@RequestBody @Valid CreateBookmarkRequest request) {
+        log.info("[createBookmark] body: {}", request.toString());
+        return service.createBookmark(request);
     }
 }

@@ -3,17 +3,24 @@ package dev.kemalyi.bookmarker.bookmark.rest;
 import dev.kemalyi.bookmarker.bookmark.jpa.BookmarkRepository;
 import dev.kemalyi.bookmarker.bookmark.jpa.entity.Bookmark;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
 import java.util.List;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,6 +32,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
         "spring.datasource.url=jdbc:tc:postgresql:15.2:///test"
 })
 class BookmarkControllerTest {
+
+    private static final String BOOKMARK_API = "/api/bookmarks";
 
     @Autowired
     private MockMvc mvc;
@@ -57,7 +66,7 @@ class BookmarkControllerTest {
             "2, 12, 6, 2"
     })
     void shouldGetBookmarks(int page, int totalElements, int totalPages, int currentPage) throws Exception {
-        mvc.perform(get("/api/bookmarks?page=" + page))
+        mvc.perform(get(BOOKMARK_API + "?page=" + page))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(totalElements))
                 .andExpect(jsonPath("$.totalPages").value(totalPages))
@@ -69,10 +78,39 @@ class BookmarkControllerTest {
             "tes, 2, 1",
             "it, 4, 2"
     })
+    @DisplayName("Found bookmark count and total pages match with expected values")
     void shouldGetFilteredBookmarks(String query, int totalElements, int totalPages) throws Exception {
-        mvc.perform(get("/api/bookmarks?query=" + query))
+        mvc.perform(get(BOOKMARK_API + "?query=" + query))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(totalElements))
                 .andExpect(jsonPath("$.totalPages").value(totalPages));
+    }
+
+    @Test
+    @DisplayName("Verify found bookmark JSON values in the response are as expected")
+    void verifyFoundBookmark() throws Exception {
+        mvc.perform(get(BOOKMARK_API + "?query=Twitter"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.bookmarks[0].title").value("Twitter"))
+                .andExpect(jsonPath("$.bookmarks[0].url").value("www.twitter.com"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("Create Bookmark Success Case")
+    void createBookmark() throws Exception {
+        mvc.perform(post(BOOKMARK_API)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "title":"kemal blog",
+                            "url":"kemalyi.dev"
+                        }
+                        """))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(notNullValue()))
+                .andExpect(jsonPath("$.title", is("kemal blog")))
+                .andExpect(jsonPath("$.url", is("kemalyi.dev")));
     }
 }
