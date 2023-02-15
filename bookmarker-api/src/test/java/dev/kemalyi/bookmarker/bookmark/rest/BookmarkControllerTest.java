@@ -67,6 +67,7 @@ class BookmarkControllerTest {
             "1, 12, 6, 1",
             "2, 12, 6, 2"
     })
+    @DisplayName("Get all bookmarks with specified page no")
     void shouldGetBookmarks(int page, int totalElements, int totalPages, int currentPage) throws Exception {
         mvc.perform(get(BOOKMARK_API + "?page=" + page))
                 .andExpect(status().isOk())
