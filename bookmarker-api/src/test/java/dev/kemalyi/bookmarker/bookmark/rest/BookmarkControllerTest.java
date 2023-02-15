@@ -19,6 +19,8 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -68,6 +70,7 @@ class BookmarkControllerTest {
     void shouldGetBookmarks(int page, int totalElements, int totalPages, int currentPage) throws Exception {
         mvc.perform(get(BOOKMARK_API + "?page=" + page))
                 .andExpect(status().isOk())
+                .andDo(print())
                 .andExpect(jsonPath("$.totalElements").value(totalElements))
                 .andExpect(jsonPath("$.totalPages").value(totalPages))
                 .andExpect(jsonPath("$.currentPage").value(currentPage));
@@ -94,6 +97,62 @@ class BookmarkControllerTest {
                 .andExpect(jsonPath("$.bookmarks[0].title").value("Twitter"))
                 .andExpect(jsonPath("$.bookmarks[0].url").value("www.twitter.com"))
                 .andDo(print());
+    }
+
+    @Test
+    @DisplayName("Create bookmark success case")
+    void createBookmarkTest() throws Exception {
+        mvc.perform(post(BOOKMARK_API)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "title":"kemal",
+                            "url":"kemalyi.dev"
+                        }
+                        """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title").value("kemal"))
+                .andExpect(jsonPath("$.url").value("kemalyi.dev"))
+                .andExpect(jsonPath("$.id").hasJsonPath())
+                .andExpect(jsonPath("$.createdAt").hasJsonPath())
+                .andExpect(jsonPath("$.updatedAt").value(nullValue()));
+    }
+
+    @Test
+    @DisplayName("Create bookmark with missing elements - fail case")
+    void createBookmarkWithMissingElements() throws Exception {
+        mvc.perform(post(BOOKMARK_API)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                            "title":"kemal"
+                        }
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Bad Request"))
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    @DisplayName("Fetch bookmark by id")
+    void fetchBookmarkById() throws Exception {
+        var id = repository.findAll().get(0).getId();
+        mvc.perform(get(BOOKMARK_API + "/" + id))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(notNullValue()))
+                .andExpect(jsonPath("$.title").value("Google"))
+                .andExpect(jsonPath("$.url").value("www.google.com.tr"));
+    }
+
+    @Test
+    @DisplayName("Fetch bookmark by id that is not present")
+    void fetchNonPresentBookmarkByid() throws Exception {
+        mvc.perform(get(BOOKMARK_API + "/1881555"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.title").value("Bookmark not found"))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.instance").value(BOOKMARK_API + "/1881555"));
     }
 
     @Test

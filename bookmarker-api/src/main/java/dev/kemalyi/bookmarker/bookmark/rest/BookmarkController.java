@@ -3,11 +3,13 @@ package dev.kemalyi.bookmarker.bookmark.rest;
 import dev.kemalyi.bookmarker.bookmark.BookmarkService;
 import dev.kemalyi.bookmarker.bookmark.dto.BookmarkDto;
 import dev.kemalyi.bookmarker.bookmark.dto.BookmarksDto;
+import dev.kemalyi.bookmarker.bookmark.rest.exception.BookmarkNotFoundException;
 import dev.kemalyi.bookmarker.bookmark.rest.requests.CreateBookmarkRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -21,7 +23,7 @@ import java.util.Optional;
 public class BookmarkController {
     private final BookmarkService service;
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public BookmarksDto getBookmarks(@RequestParam(name = "page") Optional<Integer> page, @RequestParam(name = "query", required = false, defaultValue = "") String query) {
         int actualPage = page.orElse(1);
         if (query == null || query.isEmpty())
@@ -29,10 +31,15 @@ public class BookmarkController {
         return service.searchBookmarks(query, actualPage);
     }
 
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public BookmarkDto getBookmarkById(@PathVariable(name = "id") Long id) {
+        return service.getBookmarkById(id);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public BookmarkDto createBookmark(@RequestBody @Valid CreateBookmarkRequest request) {
-        log.info("[createBookmark] body: {}", request.toString());
+        log.trace("[createBookmark] body: {}", request.toString());
         return service.createBookmark(request);
     }
 }

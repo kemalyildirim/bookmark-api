@@ -4,20 +4,23 @@ import dev.kemalyi.bookmarker.bookmark.dto.BookmarkDto;
 import dev.kemalyi.bookmarker.bookmark.dto.BookmarksDto;
 import dev.kemalyi.bookmarker.bookmark.jpa.BookmarkRepository;
 import dev.kemalyi.bookmarker.bookmark.jpa.entity.Bookmark;
+import dev.kemalyi.bookmarker.bookmark.rest.exception.BookmarkNotFoundException;
 import dev.kemalyi.bookmarker.bookmark.rest.requests.CreateBookmarkRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.http.HttpResponse;
 import java.time.Instant;
+import java.util.Optional;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class BookmarkService {
     private static final int PAGE_SIZE = 2;
     private final BookmarkRepository repository;
@@ -42,5 +45,9 @@ public class BookmarkService {
     public BookmarkDto createBookmark(CreateBookmarkRequest request) {
         Bookmark bookmark = new Bookmark(null, request.title(), request.url(), Instant.now(), null);
         return repository.save(bookmark).toModel();
+    }
+
+    public BookmarkDto getBookmarkById(Long id) {
+        return repository.findBookmarkById(id).orElseThrow(() -> new BookmarkNotFoundException("Bookmark not found"));
     }
 }

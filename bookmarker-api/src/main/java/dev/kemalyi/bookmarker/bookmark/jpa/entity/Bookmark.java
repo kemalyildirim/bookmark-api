@@ -34,6 +34,6 @@ public class Bookmark {
     private Instant updatedAt;
 
     public BookmarkDto toModel() {
-        return new BookmarkDto(this.id, this.title, this.url, this.createdAt);
+        return new BookmarkDto(this.id, this.title, this.url, this.createdAt, this.updatedAt);
     }
 }

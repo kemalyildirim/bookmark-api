@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
+
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 
     @Query("""
@@ -15,7 +17,8 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
                     b.id,
                     b.title,
                     b.url,
-                    b.createdAt
+                    b.createdAt,
+                    b.updatedAt
                 )
             FROM Bookmark b
             """)
@@ -26,7 +29,21 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
                     b.id,
                     b.title,
                     b.url,
-                    b.createdAt
+                    b.createdAt,
+                    b.updatedAt
+                )
+            FROM Bookmark b
+            WHERE b.id = :id
+            """)
+    Optional<BookmarkDto> findBookmarkById(Long id);
+
+    @Query("""
+            SELECT new dev.kemalyi.bookmarker.bookmark.dto.BookmarkDto(
+                    b.id,
+                    b.title,
+                    b.url,
+                    b.createdAt,
+                    b.updatedAt
                 )
             FROM Bookmark b
             WHERE lower(b.title) like lower(concat('%', :query, '%'))
