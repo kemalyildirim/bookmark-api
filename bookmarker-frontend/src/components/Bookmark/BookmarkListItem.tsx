@@ -25,8 +25,11 @@ const BookmarkListItem = ({
   createdAt,
   updatedAt,
 }: BookmarkListItemProps) => {
-  const [displayCreatedDate, setDisplayDate] = useState(createdAt);
-  useEffect(() => setDisplayDate(formatDate(displayCreatedDate)));
+  const [displayCreatedDate, setDisplayDate] = useState("");
+
+  useEffect(() => {
+    setDisplayDate(formatDate(createdAt));
+  });
   return (
     <a
       href={`https://${url}`}
