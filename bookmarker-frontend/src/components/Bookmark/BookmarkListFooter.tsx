@@ -2,42 +2,51 @@
 
 interface FooterProps {
   totalPages: number;
-  totalElements: number;
+  totalElements?: number;
   currentPage: number;
+  loadNewPage: Function;
 }
 const BookmarkListFooter = ({
   totalPages,
   totalElements,
   currentPage,
+  loadNewPage,
 }: FooterProps) => {
   return (
-    <nav className="" aria-label="...">
-      <ul className="pagination ml-2">
-        <li className={`page-item ${currentPage <= 1 ? "disabled" : ""}`}>
-          <span className="page-link">Previous</span>
-        </li>
-        {Array.from({ length: totalPages }, (_, i: number) => {
-          i++;
-          console.log("i: " + i);
-          return (
-            <li
-              className={`page-item ${currentPage == i ? "active" : ""}`}
-              key={i}
-            >
-              <a className="page-link" href="#">
-                {i}
-              </a>
-            </li>
-          );
-        })}
-        <li
-          className={`page-item ${currentPage >= totalPages ? "disabled" : ""}`}
+    <nav className="pagination justify-content-center mt-3" aria-label="...">
+      <li className={`page-item ${currentPage <= 1 ? "disabled" : ""}`}>
+        <a
+          className="page-link"
+          onClick={() => loadNewPage(currentPage - 1)}
+          href="#"
         >
-          <a className="page-link" href="#">
-            Next
-          </a>
-        </li>
-      </ul>
+          Previous
+        </a>
+      </li>
+      {Array.from({ length: totalPages }, (_, i: number) => {
+        i++;
+        return (
+          <li
+            className={`page-item ${currentPage == i ? "active" : ""}`}
+            key={i}
+          >
+            <a className="page-link" onClick={() => loadNewPage(i)} href="#">
+              {i}
+            </a>
+          </li>
+        );
+      })}
+      <li
+        className={`page-item ${currentPage >= totalPages ? "disabled" : ""}`}
+      >
+        <a
+          className="page-link"
+          onClick={() => loadNewPage(currentPage + 1)}
+          href="#"
+        >
+          Next
+        </a>
+      </li>
     </nav>
   );
 };

@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import { ColorPalette } from "@/components/Theme";
+import "src/app/global.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export const metadata = {
@@ -14,7 +15,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body style={{ backgroundColor: ColorPalette.DarkTheme.backgroundColor }}>
+      <body
+        style={{
+          backgroundColor: ColorPalette.DarkTheme.backgroundColor,
+        }}
+      >
         <Navbar items={[{ href: "add-bookmark", name: "Add Bookmark" }]} />
         {children}
       </body>
