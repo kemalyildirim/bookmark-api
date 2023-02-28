@@ -39,9 +39,9 @@ stop() {
 
 main() {
   case $1 in
-    "--start-all")
+    "--start")
     start ;;
-    "--stop-all")
+    "--stop")
     stop ;;
     "--start-infra")
     start_infra ;;
@@ -51,6 +51,8 @@ main() {
     start_app ;;
     "--stop-app")
     stop_app ;;
+    "--build-app")
+    build_app ;;
     "--help")
     printf "bookmarker-app helper CLI tool\n\n"
     printf "--start\n\t start app with all components\n"
@@ -61,8 +63,6 @@ main() {
     printf "--stop-infra\n\t stop infra services\n"
     printf "--build-app\n\t build the Java application\n"
     ;;
-    "--build-app")
-    build_app ;;
   esac
 }
 
